@@ -1,0 +1,5 @@
+__pycache__/
+.venv/
+config.py
+
+utils/pre_commit_checks.py

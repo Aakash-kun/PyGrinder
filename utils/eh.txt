@@ -1,0 +1,16 @@
+Stuff Because I No Remember
+
+
+Status codes used:
+
+    - 200: Ok! With content
+    - 204: Ok! Without content
+    - 400: InvalidResponse : bot did not reply with something I expected it to contain
+    - 403: Account Bot Banned
+    - 408: ResponeTimeout : did not reply in given response timeout :(
+    - 412: NotJson : bot did not reply with json
+    - 417: CommandNotSent : command was not sent
+    - 422: NotHandled : something I did not forsee!
+    - 424: InteractionFailed
+    - 429: cooldown
+    - 498: Account Discord Banned
