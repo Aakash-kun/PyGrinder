@@ -61,9 +61,10 @@ class Instance:
         self.ws = config["ws"]
         self.heartbeat_interval: int = config["heartbeat_interval"]
         self.session: aiohttp.ClientSession = sessions.session
+        self.voting_session: aiohttp.ClientSession = sessions.voting_session
 
         self.logger: logging.Logger = config["logger"]
-        self.voting_session: aiohttp.ClientSession = sessions.voting_session
+        self.traceback_logger: logging.Logger = config["traceback_logger"]
 
         self._search_preference: list = config["_search_preference"]
         self._search_cancel: list = config["_search_cancel"]

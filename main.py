@@ -74,6 +74,15 @@ logging.basicConfig(
 config["logger"] = logging.getLogger()
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
 
+logging.basicConfig(
+    filename=f"tracebacks\{config['id']}.log",
+    format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(token)s | %(traceback_id)s | %(username)-10s \n %(message)s \n =========================",
+    datefmt="%I:%M:%S %p %d/%m/%Y",
+    level="INFO"
+)
+config["traceback_logger"] = logging.getLogger()
+# # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
+
 
 instance = Instance(config, sessions=my_sessions)
 time.sleep(10)
