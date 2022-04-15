@@ -1,9 +1,10 @@
+import asyncio
 import logging
-from typing_extensions import Self
 import aiohttp
 import time
 from scheduler import schedule
-from utils import get_headers
+from utils.utils import get_headers
+
 class Author:
     def __init__(self, json) -> None:
         self.id = json["id"]
@@ -46,7 +47,7 @@ class MessageClass:
         self.components = [Button(component) for component in message_json["components"][0]]
 
 class Instance:
-    def __init__(self, config: dict, sessions) -> None:
+    def __init__(self, config: dict) -> None:
         self.id: int = config["id"]
         self.name: str = config["name"]
         self.token: str = config["token"]
@@ -60,8 +61,8 @@ class Instance:
 
         self.ws = config["ws"]
         self.heartbeat_interval: int = config["heartbeat_interval"]
-        self.session: aiohttp.ClientSession = sessions.session
-        self.voting_session: aiohttp.ClientSession = sessions.voting_session
+        self.session: aiohttp.ClientSession = asyncio.get_event_loop().run_until_complete(create_session())
+        self.voting_session: aiohttp.ClientSession = asyncio.get_event_loop().run_until_complete(self.create_voting_session())
 
         self.logger: logging.Logger = config["logger"]
         self.traceback_logger: logging.Logger = config["traceback_logger"]
@@ -73,6 +74,17 @@ class Instance:
         self._crime_preference: list = config["_crime_preference"]
         self._crime_cancel: list = config["_crime_cancel"]
         self._crime_timeout: int = config["_crime_timeout"]
+    
+    async def create_voting_session(self):
+        my_session = aiohttp.ClientSession()
+        return my_session
+    
+    async def _close_client_sessions(self):
+        await self.session.close()
+        await self.voting_session.close()
+    
+    def close_sessions(self):
+        asyncio.get_event_loop().run_until_complete(self._close_client_sessions())
 
     def _update_balance(self, amount, task):
         if task == "ADD":
@@ -110,3 +122,8 @@ class Instance:
                 return 200, MessageClass(event["d"])
         else:
             return 408, None
+        
+
+async def create_session():
+    mysession = aiohttp.ClientSession()
+    return mysession

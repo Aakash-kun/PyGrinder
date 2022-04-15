@@ -2,7 +2,7 @@
 
 # from functions.basic7functions import beg, crime, search, postmeme
 # from functions.excess_tasks import timely, vote
-from utils.Classes import Instance
+from utils.Classes import Instance, create_session
 from ws import heartbeat, create
 import logging
 import aiohttp
@@ -15,9 +15,9 @@ import time
 # Creating a Instance of Classes.Instance
 
 config = {
-    "token" :"token",
+    "token": "token",
     "grind_channel_id": 1234,
-    "master_id": "1234",
+    "master_id": 1234,
     "response_timeout": 10,
     "queue" : Q(),
 
@@ -30,34 +30,12 @@ config = {
     "_crime_timeout": 10,
     }
 
-config["name"], config["id"], config["coins"], config["items"] = asyncio.run(startup(config["token"]))
+loop = asyncio.get_event_loop()
+# config["name"], config["id"], config["coins"], config["items"] = loop.run_until_complete(startup(config["token"]))
+config["name"], config["id"], config["coins"], config["items"] = "name", "1", 1, {"h": 5}
 
-
-async def sessions():
-    session = None
-    voting_session = None
-    async with aiohttp.ClientSession() as session:
-        session = session
-    async with aiohttp.ClientSession() as voting_session:
-        voting_session = voting_session
-    return session, voting_session
-
-class MySessions():
-    pass
-
-my_sessions = MySessions()
-async def sessions():
-    my_sessions.session = aiohttp.ClientSession()
-    my_sessions.voting_session = aiohttp.ClientSession()
-
-loop = asyncio.new_event_loop()
-loop.create_task(sessions())
-loop.run_until_complete()
-
-# config["session"] = aiohttp.ClientSession()
-# config["voting_session"] = aiohttp.ClientSession()
-
-ws, heartbeat_interval = asyncio.run(create.create(config["token"], my_sessions.session))
+ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], 
+                                                               loop.run_until_complete(create_session())))
 
 config["ws"] = ws
 config["heartbeat_interval"] = heartbeat_interval
@@ -84,7 +62,6 @@ config["traceback_logger"] = logging.getLogger()
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
 
 
-instance = Instance(config, sessions=my_sessions)
+instance = Instance(config)
 time.sleep(10)
-instance["session"].close()
-instance["voting_session"].close()
+instance.close_sessions()
