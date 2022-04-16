@@ -1,5 +1,5 @@
 
-from ...utils import fund
+from ..otherfunctions import fund
 import traceback
 
 """

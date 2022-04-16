@@ -1,4 +1,4 @@
-from ...utils import fund
+from ..otherfunctions import fund
 from ..config import conf
 from ..support_functions import sfd
 import random

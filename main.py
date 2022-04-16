@@ -5,13 +5,11 @@ from functions.basic7functions import beg, crime, search, postmeme
 from utils.Classes import Instance, create_session
 from ws import heartbeat, create
 import logging
-import aiohttp
 from scheduler.schedule import Q
 from functions.excess_tasks.startup import startup
 import asyncio
 import os
 import time
-print("h1")
 # Creating a Instance of Classes.Instance
 
 config = {
@@ -29,7 +27,6 @@ config = {
     "_crime_cancel": [1, 2, 3],
     "_crime_timeout": 10,
     }
-print("h2")
 
 loop = asyncio.get_event_loop()
 # config["name"], config["id"], config["coins"], config["items"] = loop.run_until_complete(startup(config["token"]))
@@ -37,14 +34,12 @@ config["name"], config["id"], config["coins"], config["items"] = "name", "1", 1,
 
 ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], 
                                                                loop.run_until_complete(create_session())))
-print("h3")
 
 config["ws"] = ws
 config["heartbeat_interval"] = heartbeat_interval
 
 if not os.path.exists(os.getcwd()+f"/logs/{config['id']}.log"):
     open(f"logs/{config['id']}.log", "a")
-print("h4")
 
 logging.basicConfig(
     filename=f"logs\{config['id']}.log",
@@ -54,7 +49,6 @@ logging.basicConfig(
 )
 config["logger"] = logging.getLogger()
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
-print("h5")
 
 logging.basicConfig(
     filename=f"tracebacks\{config['id']}.log",
@@ -64,11 +58,8 @@ logging.basicConfig(
 )
 config["traceback_logger"] = logging.getLogger()
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
-print("h6")
 
 
 instance = Instance(config)
-print("h7")
 time.sleep(10)
 instance.close_sessions()
-print("h8")
