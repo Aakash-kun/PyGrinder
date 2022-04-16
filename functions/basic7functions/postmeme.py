@@ -1,6 +1,6 @@
 from utils import Classes, utils
 import time, secrets, random
-from support_functions import fund
+from functions.otherfunctions import fund
 
 async def postmeme_function(instance: Classes.Instance):
     payload = {"content": f"pls {random.choice(['pm', 'postmeme'])}"}
@@ -80,8 +80,10 @@ async def postmeme_function(instance: Classes.Instance):
     if interact.status_code != 204:
         return "Failed to interact", await interact.json() 
 
-
-    response = instance.wait_for("MESSAGE_UPDATE", lambda event: event["d"]["author"]["id"] == 270904126974590976 and event["d"]["referenced_message"] is not None and str(event["d"]["referenced_message"]["id"]) == str((await send_message.json()).id))
+    send_message_json = await interact.json()
+    response = instance.wait_for(
+        "MESSAGE_UPDATE",
+        lambda event: event["d"]["author"]["id"] == 270904126974590976 and event["d"]["referenced_message"] is not None and str(event["d"]["referenced_message"]["id"]) == str(send_message_json.id))
     if response[0] != 204:
         return "Bot did not reply in given response_timeout"
     if response.embed.title:

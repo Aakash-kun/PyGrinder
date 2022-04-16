@@ -1,14 +1,16 @@
-import traceback
-from utils import Classes, utils
-from typing import Optional, Union, Tuple
+import aiohttp
 
 import json
-import aiohttp
 import time
+import traceback
+from typing import Optional, Union, Tuple
+
+from utils import Classes, utils
+
 
 async def beg_function(instance: Classes.Instance) -> Tuple[int, Union[None, str]]:
     """
-    The entire function to... beg.
+    This function takes in `instance`.
     Take in instance, it has everything we need!
     """
 
@@ -19,15 +21,17 @@ async def beg_function(instance: Classes.Instance) -> Tuple[int, Union[None, str
 
     # send message response error handling
     send_message_json = None
+    traceback_id = f"{instance.id}.{str(time.time())[:14]}"
     try:
         send_message_json: Optional[dict[str, str]] = await send_message.json()
     except json.decoder.JSONDecodeError:
         instance.logger.warning("Command send response was not json-parsable", extra={"token": instance.token, "username": instance.name, "status_code": 412})
+        instance.traceback_logger.warning(traceback_id, traceback.format_exc())
         return 412, "NotJson"
     except Exception:
         traceback_id = f"{instance.id}.{time.time()}"
         instance.logger.error(f"beg send response - Unhandled Exception ({traceback_id})", extra={"token": instance.token, "username": instance.name, "status_code": 422})
-        instance.log_traceback(traceback_id, traceback.format_exc())
+        instance.traceback_logger.critical(traceback_id, traceback.format_exc())
         return 422, "NotHandled"
 
     # Send message error handling

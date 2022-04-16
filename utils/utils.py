@@ -1,11 +1,9 @@
 import re
 import secrets
-import Classes
-
 
 pattern = re.compile("\d+")
 
-def get_headers(instance: Classes.Instance, payload=None):
+def get_headers(instance, payload=None):
     headers = {
         "Authorization": instance.token,
         "Content-Type": "application/json"
