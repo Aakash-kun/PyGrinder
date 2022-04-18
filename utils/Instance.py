@@ -1,10 +1,10 @@
 import asyncio
 import logging
+from typing import Literal, Tuple, Union
 import aiohttp
 import time
 from scheduler import schedule
-from utils.utils import get_headers
-from utils import Classes
+from utils import Classes, utils
 
 class Instance:
     def __init__(self, config: dict) -> None:
@@ -40,18 +40,10 @@ class Instance:
         self._crime_cancel: list = config["_crime_cancel"]
         self._crime_timeout: int = config["_crime_timeout"]
 
-    async def create_voting_session(self):
-        my_session = aiohttp.ClientSession()
-        return my_session
-    
-    async def create_session():
-        mysession = aiohttp.ClientSession()
-        return mysession
-
     async def _close_client_sessions(self):
         await self.session.close()
         await self.voting_session.close()
-    
+
     def close_sessions(self):
         asyncio.get_event_loop().run_until_complete(self._close_client_sessions())
 
@@ -61,30 +53,31 @@ class Instance:
         else:
             return self.config
 
-    def _update_balance(self, amount, task):
+
+    def _update_balance(self, amount: int, task: Literal["ADD", "REM"]) -> None:
         if task == "ADD":
             self.coins -= amount
         elif task == "REM":
             self.coins -= amount
-        return self.coins
 
-    def _update_items(self, *items, task):
-        for item in items:
+    def _update_items(self, items: dict, task: Literal["ADD", "REM"]) -> None:
+        for item, amount in items.items():
             if task == "ADD":
-                self.items[0] += item[1]
+                self.items[item] += amount
             elif task == "REM":
-                self.items[0] -= item[1]
-        return self.items
+                self.items[item] -= amount
+
 
     async def send_message(self, payload: dict[str, str]) -> aiohttp.ClientResponse:
         send_message = await self.session.post(
             f"https://discord.com/api/v9/channels/{self.grind_channel_id}/messages",
             json=payload,
-            headers=get_headers(self, payload=payload))
+            headers=utils.get_headers(self, payload=payload))
         return send_message
 
+    # async def interact(self, )
 
-    async def wait_for(self, event_type, predicate, send_message_json):
+    async def wait_for(self, event_type: str, predicate, send_message_json: dict) -> Tuple[int, Union[None, Classes.MessageClass]]:
         start = time.time()
         if predicate == "default": # must reference
             predicate = event["d"]["author"]["id"] == 270904126974590976 and event["d"]["referenced_message"] is not None and str(event["d"]["referenced_message"]["id"]) == str(send_message_json["id"])
@@ -94,5 +87,3 @@ class Instance:
                 return 200, Classes.MessageClass(event["d"])
         else:
             return 408, None
-        
-

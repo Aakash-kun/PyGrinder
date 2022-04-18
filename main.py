@@ -35,8 +35,8 @@ instance = Instance.Instance(config)
 ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], instance.session))
 
 config["ws"] = ws
-instance.ws = ws
 config["heartbeat_interval"] = heartbeat_interval
+instance.ws = ws
 instance.heartbeat_interval = heartbeat_interval
 
 if not os.path.exists(os.getcwd()+f"/logs/{config['id']}.log"):

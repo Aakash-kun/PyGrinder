@@ -1,12 +1,9 @@
-import asyncio
-from ..config import conf
-from ..support_functions import sfd
+from utils import Instance
 
-async def buy(bot, item):
-    ms = await bot.grind_channel.send(f"pls buy {item}")
-    def check(m):
-        return m.author.id == 270904126974590976 and m.channel == ms.channel and m.reference.message_id == ms.id
-    msg = await bot.wait_for("message", check=check, timeout=conf.response_timeout)
+async def buy(instance: Instance.Instance, item: str, amount: int):
+    ms = await instance.send_message(f"pls buy {item}")
+
+    msg = await instance.wait_for("message", check=check, timeout=conf.response_timeout)
 
     try:
         interactions = await sfd.get_interactions(msg, bot)
