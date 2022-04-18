@@ -1,5 +1,3 @@
-# what this file should actually do and stuff
-
 from functions.basic7functions import beg, crime, search, postmeme
 # from functions.excess_tasks import timely, vote
 from utils.Classes import Instance
@@ -9,9 +7,9 @@ from scheduler.schedule import Q
 from functions.excess_tasks.startup import startup
 import asyncio
 import os
-import time
-# Creating a Instance of Classes.Instance
 
+
+# Creating a Instance of Classes.Instance
 config = {
     "token": "token",
     "grind_channel_id": 1234,
@@ -37,7 +35,9 @@ instance = Instance(config)
 ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], instance.session))
 
 config["ws"] = ws
+instance.ws = ws
 config["heartbeat_interval"] = heartbeat_interval
+instance.heartbeat_interval = heartbeat_interval
 
 if not os.path.exists(os.getcwd()+f"/logs/{config['id']}.log"):
     open(f"logs/{config['id']}.log", "a")
@@ -49,6 +49,7 @@ logging.basicConfig(
     level="INFO"
 )
 config["logger"] = logging.getLogger()
+instance.logger = config["logger"]
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
 
 logging.basicConfig(
@@ -58,6 +59,7 @@ logging.basicConfig(
     level="INFO"
 )
 config["traceback_logger"] = logging.getLogger()
+instance.traceback_logger = config["traceback_logger"]
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
 
 instance.close_sessions()
