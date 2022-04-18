@@ -1,6 +1,6 @@
 from functions.basic7functions import beg, crime, search, postmeme
 # from functions.excess_tasks import timely, vote
-from utils.Classes import Instance
+from utils import Instance
 from ws import heartbeat, create
 import logging
 from scheduler.schedule import Q
@@ -31,7 +31,7 @@ loop = asyncio.get_event_loop()
 # config["name"], config["id"], config["coins"], config["items"] = loop.run_until_complete(startup(config["token"]))
 config["name"], config["id"], config["coins"], config["items"] = "name", "1", 1, {"h": 5}
 
-instance = Instance(config)
+instance = Instance.Instance(config)
 ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], instance.session))
 
 config["ws"] = ws
