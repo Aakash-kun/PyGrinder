@@ -23,10 +23,8 @@ class Instance:
         self.ws: aiohttp.ClientWebSocketResponse = None
         self.heartbeat_interval: int = None
 
-        # self.session: aiohttp.ClientSession = asyncio.get_event_loop().run_until_complete(self.create_session())
-        # self.voting_session: aiohttp.ClientSession = asyncio.get_event_loop().run_until_complete(self.create_voting_session())
-        self.session = aiohttp.ClientSession()
-        self.voting_session = aiohttp.ClientSession()
+        self.session: aiohttp.ClientSession = asyncio.get_event_loop().run_until_complete(self.create_session())
+        self.voting_session: aiohttp.ClientSession = asyncio.get_event_loop().run_until_complete(self.create_voting_session())
 
 
         self.logger: logging.Logger = None
@@ -39,6 +37,14 @@ class Instance:
         self._crime_preference: list = config["_crime_preference"]
         self._crime_cancel: list = config["_crime_cancel"]
         self._crime_timeout: int = config["_crime_timeout"]
+        
+    async def create_session(self):
+        my_session = aiohttp.ClientSession()
+        return my_session
+        
+    async def create_voting_session(self):
+        my_session = aiohttp.ClientSession()
+        return my_session
 
     async def _close_client_sessions(self):
         await self.session.close()
@@ -53,7 +59,6 @@ class Instance:
         else:
             return self.config
 
-
     def _update_balance(self, amount: int, task: Literal["ADD", "REM"]) -> None:
         if task == "ADD":
             self.coins -= amount
@@ -66,7 +71,6 @@ class Instance:
                 self.items[item] += amount
             elif task == "REM":
                 self.items[item] -= amount
-
 
     async def send_message(self, payload: dict[str, str]) -> aiohttp.ClientResponse:
         send_message = await self.session.post(
