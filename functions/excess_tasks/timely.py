@@ -1,7 +1,8 @@
-from utils import Classes, utils
+from utils import Classes, utils, Instance
 import time
 
-async def timely_function(instance: Classes.Instance, command: str):
+
+async def timely_function(instance: Instance.Instance, command: str):
     """
     Common function for daily/weekly/monthly commands
     instance contains all necessary attrs, command is the command name

@@ -5,15 +5,10 @@ import time
 import traceback
 from typing import Optional, Union, Tuple
 
-from utils import Classes, utils
+from utils import Classes, utils, Instance
 
 
-async def beg_function(instance: Classes.Instance) -> Tuple[int, Union[None, str]]:
-    """
-    This function takes in `instance`.
-    Take in instance, it has everything we need!
-    """
-
+async def beg_function(instance: Instance.Instance) -> Tuple[int, Union[None, str]]:
     # Send message and log
     payload = {"content": "pls beg"}
     send_message: aiohttp.ClientResponse = await instance.send_message(payload)
@@ -25,13 +20,12 @@ async def beg_function(instance: Classes.Instance) -> Tuple[int, Union[None, str
     try:
         send_message_json: Optional[dict[str, str]] = await send_message.json()
     except json.decoder.JSONDecodeError:
-        instance.logger.warning("Command send response was not json-parsable", extra={"token": instance.token, "username": instance.name, "status_code": 412})
-        instance.traceback_logger.warning(traceback_id, traceback.format_exc())
+        instance.logger.warning(f"Command send response was not json-parsable. Traceback ID: {traceback_id}", extra={"token": instance.token, "username": instance.name, "status_code": 412})
+        instance.traceback_logger.warning(traceback.format_exc())
         return 412, "NotJson"
     except Exception:
-        traceback_id = f"{instance.id}.{time.time()}"
-        instance.logger.error(f"beg send response - Unhandled Exception ({traceback_id})", extra={"token": instance.token, "username": instance.name, "status_code": 422})
-        instance.traceback_logger.critical(traceback_id, traceback.format_exc())
+        instance.logger.error(f"beg send response - Unhandled Exception. Traceback ID: {traceback_id})", extra={"token": instance.token, "username": instance.name, "status_code": 422})
+        instance.traceback_logger.critical(traceback.format_exc())
         return 422, "NotHandled"
 
     # Send message error handling
@@ -56,7 +50,7 @@ async def beg_function(instance: Classes.Instance) -> Tuple[int, Union[None, str
     if response.embed.title:
         if "Stop begging so much" not in response.embed.description:
             instance.logger.critical(f"Beg reply embed had a title without a ratelimit, conclusion: account has been banned.", extra={"token": instance.token, "username": instance.name, "status_code": 423})
-            return 423, "Banned"
+            return 999, "PANIC"
         else:
             instance.logger.warning(f"Beg reply embed had a title with a ratelimit, conclusion: command cooldown.", extra={"token": instance.token, "username": instance.name, "status_code": 429})
             return 429, int(response.embed.description.split("**")[1].split(" ")[0])

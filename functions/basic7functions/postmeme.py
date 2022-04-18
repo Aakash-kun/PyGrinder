@@ -1,8 +1,8 @@
 from utils import Classes, utils
 import time, secrets, random
-from functions.otherfunctions import fund
+from utils import Instance
 
-async def postmeme_function(instance: Classes.Instance):
+async def postmeme_function(instance: Instance.Instance):
     payload = {"content": f"pls {random.choice(['pm', 'postmeme'])}"}
     send_message = await instance.session.post(
         f"https://discord.com/api/v9/channels/{instance.grind_channel_id}/messages",

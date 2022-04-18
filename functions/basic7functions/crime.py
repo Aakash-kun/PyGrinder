@@ -1,9 +1,9 @@
 from ctypes import Union
-from utils import Classes, utils
-import time, secrets, random
+from utils import Classes, utils, Instance
+import random
 import json
 
-async def crime_function(instance: Classes.Instance):
+async def crime_function(instance: Instance.Instance):
 
     payload = {"content": "pls crime"}
     send_message = await instance.session.post(
@@ -39,7 +39,7 @@ async def crime_function(instance: Classes.Instance):
     if response.embed.title:
         if "You can't commit so many crimes" not in response.description:
             instance.logger.critical(f"Crime reply embed had a title without a ratelimit, conclusion: account has been banned.", extra={"token": instance.token, "username": instance.name, "status_code": 423})
-            return 423, None
+            return 999, "PANIC"
         else:
             instance.logger.warning(f"Crime reply embed had a title with a ratelimit, conclusion: command cooldown.", extra={"token": instance.token, "username": instance.name, "status_code": 429})
             return 429, int(response.embed.description.split("**")[1].split(" ")[0])
@@ -48,9 +48,6 @@ async def crime_function(instance: Classes.Instance):
         return 417, "Bot did not reply with a valid response"
 
     options = {c.label : c.custom_id for c in response.components}
-
-
-
     option = False
     if instance._crime_mode == 0:
         for i in instance._crime_preferences:

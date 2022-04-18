@@ -1,8 +1,8 @@
-from utils import Classes, utils
+from utils import Classes, utils, Instance
 from typing import Union
 import json
 
-async def hunt_function(instance: Classes.Instance):
+async def hunt_function(instance: Instance.Instance):
     payload = {"content": "pls hunt"}
     send_message = await instance.session.post(
         f"https://discord.com/api/v9/channels/{instance.grind_channel_id}/messages",
@@ -34,36 +34,5 @@ async def hunt_function(instance: Classes.Instance):
     elif response[0] == 200:
         instance.logger.debug(f"Bot gave a valid reply in given response_timeout.", extra={"token": instance.token, "username": instance.name, "status_code": 408})
 
-    if "You went hunting in the woods" in sfd.clean(msg.content):
-        return
-
-    if "You don't have a hunting rifle" in msg.content:
-        await fund("rifle")
-        return
-
-    if "fireball" not in msg.content and "dodge" not in msg.content:
-        return
-
-    # Dodge the fireball code goes here lmfao.
-    interactions = sfd.get_interactions(msg, bot)
-    custom_id = interactions[1]["custom_id"][:-2]
-
-    def checkedit(old_message, new_message):
-        return old_message == new_message.author and old_message.channel == new_message.channel and new_message.reference.message_id == ms.id
-    oldmsg, newmsg = await bot.wait_for("message_edit" , check=checkedit, timeout=conf.timeout)
-
-    thefireline = newmsg.content.split("\n")[1]
-    seven_spaces = "       "
-    fourteen_spaces = "              "
-    if " " not in thefireline:
-        return sfd.react(f'{custom_id}{random.choices([":2", ":3"])}')
-
-    elif seven_spaces in thefireline and fourteen_spaces not in thefireline:
-        return sfd.react(f'{custom_id}{random.choices([":1", ":3"])}')
-
-    elif fourteen_spaces in thefireline:
-        return sfd.react(f'{custom_id}{random.choices([":1", ":2"])}')
-    
-    await bot.wait_for("message_edit" , check=checkedit, timeout=conf.timeout)
-    
-    return
+    what?
+    to be done.

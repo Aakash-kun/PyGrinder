@@ -2,7 +2,7 @@
 
 from functions.basic7functions import beg, crime, search, postmeme
 # from functions.excess_tasks import timely, vote
-from utils.Classes import Instance, create_session
+from utils.Classes import Instance
 from ws import heartbeat, create
 import logging
 from scheduler.schedule import Q
@@ -26,14 +26,15 @@ config = {
     "_crime_preference": [1, 2, 3],
     "_crime_cancel": [1, 2, 3],
     "_crime_timeout": 10,
+
     }
 
 loop = asyncio.get_event_loop()
 # config["name"], config["id"], config["coins"], config["items"] = loop.run_until_complete(startup(config["token"]))
 config["name"], config["id"], config["coins"], config["items"] = "name", "1", 1, {"h": 5}
 
-ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], 
-                                                               loop.run_until_complete(create_session())))
+instance = Instance(config)
+ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], instance.session))
 
 config["ws"] = ws
 config["heartbeat_interval"] = heartbeat_interval
@@ -52,14 +53,12 @@ config["logger"] = logging.getLogger()
 
 logging.basicConfig(
     filename=f"tracebacks\{config['id']}.log",
-    format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(token)s | %(traceback_id)s | %(username)-10s \n %(message)s \n =========================",
+    format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(token)s | %(traceback_id)s | %(username)-10s \n\n %(message)s\n=========================\n\n",
     datefmt="%I:%M:%S %p %d/%m/%Y",
     level="INFO"
 )
 config["traceback_logger"] = logging.getLogger()
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
 
-
-instance = Instance(config)
-time.sleep(10)
 instance.close_sessions()
+print(instance.get_details())

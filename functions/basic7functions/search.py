@@ -1,4 +1,4 @@
-from utils import Classes, utils
+from utils import Classes, utils, Instance
 from typing import Union
 
 import secrets
@@ -6,7 +6,7 @@ import random
 import json
 
 
-async def search_function(instance: Classes.Instance):
+async def search_function(instance: Instance.Instance):
     """
     The entire function to... search.
     Take in instance, it has everything we need!
@@ -50,11 +50,13 @@ async def search_function(instance: Classes.Instance):
     elif response[0] == 200:
         instance.logger.debug(f"Bot gave a valid reply in given response_timeout.", extra={"token": instance.token, "username": instance.name, "status_code": 200})
 
+    response: Classes.MessageClass = response[1]
+
     # Bot response parsing for ban or cooldown
     if response.embed.title:
         if "You've already searched the area" not in response.description:
             instance.logger.critical(f"search reply embed had a title without a ratelimit, conclusion: account has been banned.", extra={"token": instance.token, "username": instance.name, "status_code": 423})
-            return 423, "Banned"
+            return 999, "PANIC"
 
         else:
             instance.logger.warning(f"Beg reply embed had a title with a ratelimit, conclusion: command cooldown.", extra={"token": instance.token, "username": instance.name, "status_code": 429})
@@ -143,7 +145,7 @@ async def search_function(instance: Classes.Instance):
     # Bot response error handling
     if response[0] == 408:
         instance.logger.warning(f"Bot did not reply in given response_timeout.", extra={"token": instance.token, "username": instance.name, "status_code": 408})
-        return 408, "ResposneTimeOut"
+        return 408, "ResposneTimeout"
     elif response[0] == 200:
         instance.logger.debug(f"Bot gave a valid reply in given response_timeout.", extra={"token": instance.token, "username": instance.name, "status_code": 408})
 

@@ -1,6 +1,6 @@
-from utils import Classes
+from utils import Classes, Instance
 
-async def dbl_vote(instance: Classes.Instance):
+async def dbl_vote(instance: Instance.Instance):
     """
     Vote for the bot on discordbotslist.com
     The instance class contains all necessary attrs
