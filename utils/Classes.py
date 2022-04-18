@@ -38,4 +38,3 @@ class MessageClass:
         self.embed = Embed(message_json["embeds"][0]) if message_json.get("embeds") else None
         self.reference = Reference(message_json["reference"]) if message_json.get("reference") else None
         self.components = [Button(component) for component in message_json["components"][0]]
-
