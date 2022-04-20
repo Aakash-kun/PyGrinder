@@ -5,6 +5,7 @@ import aiohttp
 import time
 from scheduler import schedule
 from utils import Classes, utils
+from apscheduler.schedulers.background import BackgroundScheduler
 
 class Instance:
     def __init__(self, config: dict) -> None:
@@ -15,7 +16,9 @@ class Instance:
         self.grind_channel_id: int = config["grind_channel_id"]
         self.master_id: int = config["master_id"]
         self.response_timeout: int = config["response_timeout"]
+
         self.queue: schedule.Q() = config["queue"]
+        self.scheduler = BackgroundScheduler()
 
         self.coins: int = config["coins"]
         self.items: dict = config["items"] # {item: amount}
@@ -29,6 +32,8 @@ class Instance:
 
         self.logger: logging.Logger = None
         self.traceback_logger: logging.Logger = None
+
+        self._beg_interval = int(config["_beg_interval"])
 
         self._search_preference: list = config["_search_preference"]
         self._search_cancel: list = config["_search_cancel"]

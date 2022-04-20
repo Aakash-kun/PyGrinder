@@ -1,10 +1,6 @@
 import aiohttp
 
-import json
-import time
-import traceback
-from typing import Optional, Union, Tuple
-
+from typing import Union, Tuple
 from utils import Classes, utils, Instance
 
 
@@ -14,24 +10,11 @@ async def beg_function(instance: Instance.Instance) -> Tuple[int, Union[None, st
     send_message: aiohttp.ClientResponse = await instance.send_message(payload)
     instance.logger.debug("Sent command request.", extra={"token": instance.token, "username": instance.name, "status_code": 200})
 
-    # send message response error handling
-    send_message_json = None
-    traceback_id = f"{instance.id}.{str(time.time())[:14]}"
-    try:
-        send_message_json: Optional[dict[str, str]] = await send_message.json()
-    except json.decoder.JSONDecodeError:
-        instance.logger.warning(f"Command send response was not json-parsable. Traceback ID: {traceback_id}", extra={"token": instance.token, "username": instance.name, "status_code": 412})
-        instance.traceback_logger.warning(traceback.format_exc())
-        return 412, "NotJson"
-    except Exception:
-        instance.logger.error(f"beg send response - Unhandled Exception. Traceback ID: {traceback_id})", extra={"token": instance.token, "username": instance.name, "status_code": 422})
-        instance.traceback_logger.critical(traceback.format_exc())
-        return 422, "NotHandled"
+    send_message_response = await utils.send_response_eh(instance, send_message)
+    if send_message_response[0] not in (200, 204):
+        return send_message_response
 
-    # Send message error handling
-    if send_message.status_code not in (200, 204):
-        instance.logger.warning("Command was not sent.", extra={"token": instance.token, "username": instance.name, "status_code": 417})
-        return 417, send_message_json if send_message_json else send_message.content
+    send_message_json = send_message_response[1]
 
     # Wait for bot response
     response: Union[Classes.MessageClass, None] = await instance.wait_for(

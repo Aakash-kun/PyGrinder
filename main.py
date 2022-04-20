@@ -17,6 +17,8 @@ config = {
     "response_timeout": 10,
     "queue" : Q(),
 
+    "_beg_interval": 10,
+
     "_search_preference": [1, 2, 3],
     "_search_cancel": [1, 2, 3],
     "_search_timeout": 10,
@@ -62,5 +64,14 @@ config["traceback_logger"] = logging.getLogger()
 instance.traceback_logger = config["traceback_logger"]
 # # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
 
-instance.close_sessions()
-print(instance.get_details())
+def queue_beg():
+    instance.queue.put(1, beg.beg, instance)
+
+def queue_heartbeat():
+    instance.queue.put(0, heartbeat.heartbeat, instance)
+instance.scheduler.add_job(queue_beg, "interval", instance._beg_interval)
+instance.scheduler.add_job(queue_heartbeat, "interval", instance.heartbeat_interval)
+instance.scheduler.start()
+
+while True:
+    instance.queue.get()()
