@@ -7,7 +7,7 @@ async def create(token, session):
             "op":2,
             "d": {
                 "token": token,
-                "intents": 4609,
+                "intents": 37377,
                 "properties": {
                     "$os":"windows",
                     "$browser":"Discord",

@@ -4,7 +4,7 @@ async def heartbeat(instance):
             "op":1,
             "d": {
                 "token": instance.token,
-                "intents": 4609,
+                "intents": 37377,
                 "properties": {
                     "$os":"windows",
                     "$browser":"Discord",
