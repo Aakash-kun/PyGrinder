@@ -7,8 +7,7 @@ from scheduler import schedule
 from utils import Classes, utils
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import os
-
-print(os.getcwd())
+import aiosqlite
 
 class Instance:
     def __init__(self, config: dict) -> None:
@@ -46,6 +45,10 @@ class Instance:
         self._crime_preference: list = config["_crime_preference"]
         self._crime_cancel: list = config["_crime_cancel"]
         self._crime_timeout: int = config["_crime_timeout"]
+
+
+        self.utils = utils
+
 
         asyncio.get_event_loop().run_until_complete(self.create_sessions())
 
@@ -139,9 +142,15 @@ class Instance:
 
     async def db_push(self):
         db = await aiosqlite.connect("dbs/db.sqlite3")
-        await db.execute("INSERT OR REPLACE into data (user_id, coins, items) VALUES(?, ?, ?)", (self.id, self.coins, json.dumps(self.items), ))
+        await db.execute("INSERT OR REPLACE INTO data (user_id, coins, items) VALUES(?, ?, ?)", (self.id, self.coins, json.dumps(self.items), ))
         await db.commit()
         await db.close()
+
+    async def get_items_coins(self):
+        db = await aiosqlite.connect("dbs/db.sqlite3")
+        data = await db.execute("SELECT coins, items FROM data WHERE user_id = ?", (self.id, ))
+        data = await data.fetchone()
+        return data
 
     async def send_message(self, payload: dict[str, str]) -> aiohttp.ClientResponse:
         send_message = await self.session.post(
