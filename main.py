@@ -17,6 +17,8 @@ config = {
     "response_timeout": 10,
     "queue" : Q(),
 
+    "db_push_interval": 10,
+
     "_beg_interval": 10,
 
     "_search_preference": [1, 2, 3],
@@ -26,52 +28,46 @@ config = {
     "_crime_preference": [1, 2, 3],
     "_crime_cancel": [1, 2, 3],
     "_crime_timeout": 10,
-
     }
 
-loop = asyncio.get_event_loop()
-# config["name"], config["id"], config["coins"], config["items"] = loop.run_until_complete(startup(config["token"]))
-config["name"], config["id"], config["coins"], config["items"] = "name", "1", 1, {"h": 5}
-
 instance = Instance.Instance(config)
+
+loop = asyncio.get_event_loop()
+
+startup = loop.run_until_complete(startup(instance))
+
+if len(startup) == 4:
+    config["name"], config["id"], config["coins"], config["items"]
+else:
+    raise 999, "PANIC"
+
 ws, heartbeat_interval = loop.run_until_complete(create.create(config["token"], instance.session))
 
 config["ws"] = ws
 config["heartbeat_interval"] = heartbeat_interval
-instance.ws = ws
-instance.heartbeat_interval = heartbeat_interval
+
+instance.update(config)
+instance.create_loggers()
 
 if not os.path.exists(os.getcwd()+f"/logs/{config['id']}.log"):
     open(f"logs/{config['id']}.log", "a")
 
-logging.basicConfig(
-    filename=f"logs\{config['id']}.log",
-    format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(token)s | %(status_code)s | %(username)-10s | %(message)s",
-    datefmt="%I:%M:%S %p %d/%m/%Y",
-    level="INFO"
-)
-config["logger"] = logging.getLogger()
-instance.logger = config["logger"]
-# # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
-
-logging.basicConfig(
-    filename=f"tracebacks\{config['id']}.log",
-    format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(token)s | %(traceback_id)s | %(username)-10s \n\n %(message)s\n=========================\n\n",
-    datefmt="%I:%M:%S %p %d/%m/%Y",
-    level="INFO"
-)
-config["traceback_logger"] = logging.getLogger()
-instance.traceback_logger = config["traceback_logger"]
-# # logger.debug("Debug message", extra={"token": "mytoken", "username": "myusername", "status_code": 200})
 
 def queue_beg():
-    instance.queue.put(1, beg.beg, instance)
+    instance.logger.debug("Queued a beg function", extra={"token": instance.token, "username": instance.name, "status_code": 100})
+    instance.queue.put(1, beg.beg_function, instance)
 
 def queue_heartbeat():
     instance.queue.put(0, heartbeat.heartbeat, instance)
-instance.scheduler.add_job(queue_beg, "interval", instance._beg_interval)
-instance.scheduler.add_job(queue_heartbeat, "interval", instance.heartbeat_interval)
+
+def queue_db_push():
+    instance.queue.put(0, instance.db_push)
+
+instance.scheduler.add_job(queue_beg, "interval", seconds=instance._beg_interval)
+instance.scheduler.add_job(queue_heartbeat, "interval", seconds=instance.heartbeat_interval)
+instance.scheduler.add_job(queue_db_push, "interval", seconds=instance.db_push_interval)
 instance.scheduler.start()
 
 while True:
-    instance.queue.get()()
+    asyncio.get_event_loop().run_forever()
+

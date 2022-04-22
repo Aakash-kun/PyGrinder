@@ -11,6 +11,6 @@ class Q:
             self.funcs.insert(priority, partial(func, *args))
 
     def get(self):
-        while len(self.funcs) == 0:
+        while not self.funcs:
             continue
         return self.funcs.pop()
