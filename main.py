@@ -11,7 +11,7 @@ import os
 
 # Creating a Instance of Classes.Instance
 config = {
-    "token": "OTU1ODc2ODkxNDUyMTI1MjA0.Yk_LVw.546Bq-nxOhElIUkBW0KFWQlXdQc",
+    "token": "token",
     "grind_channel_id": 1234,
     "master_id": 1234,
     "response_timeout": 10,
