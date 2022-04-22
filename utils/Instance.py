@@ -55,6 +55,7 @@ class Instance:
     def update(self, config):
         self.__init__(config)
 
+
     def create_loggers(self):
         logging.basicConfig(
             filename=f"logs\{self.config['id']}.log",
@@ -77,35 +78,9 @@ class Instance:
         self.config["traceback_logger"] = traceback_logger
 
 
-    def create_loggers(self):
-        logging.basicConfig(
-            filename=f"logs\{self.config['id']}.log",
-            format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(name)s | %(code)s | %(message)s",
-            datefmt="%I:%M:%S %p %d/%m/%Y",
-            level="DEBUG"
-        )
-        logger = logging.getLogger()
-        self.logger = logger
-        self.config["logger"] = logger
-
-        logging.basicConfig(
-            filename=f"tracebacks\{self.config['id']}.log",
-            format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(name)s | %(traceback_id)s | %(code)-10s \n\n %(message)s\n=========================\n\n",
-            datefmt="%I:%M:%S %p %d/%m/%Y",
-            level="DEBUG"
-        )
-        traceback_logger = logging.getLogger()
-        self.traceback_logger = traceback_logger
-        self.config["traceback_logger"] = traceback_logger
-
-
     async def create_sessions(self):
         self.session = aiohttp.ClientSession()
         self.voting_session = aiohttp.ClientSession()
-        
-    # async def create_voting_session(self):
-    #     my_session = aiohttp.ClientSession()
-    #     return my_session
 
     async def _close_client_sessions(self):
         await self.session.close()
@@ -113,6 +88,7 @@ class Instance:
 
     def close_sessions(self):
         asyncio.get_event_loop().run_until_complete(self._close_client_sessions())
+
 
     def get_details(self, key=None):
         if key:
@@ -150,7 +126,10 @@ class Instance:
         db = await aiosqlite.connect("dbs/db.sqlite3")
         data = await db.execute("SELECT coins, items FROM data WHERE user_id = ?", (self.id, ))
         data = await data.fetchone()
+        if not data:
+            return 0, {}
         return data
+
 
     async def send_message(self, payload: dict[str, str]) -> aiohttp.ClientResponse:
         send_message = await self.session.post(

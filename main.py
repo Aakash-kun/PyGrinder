@@ -34,10 +34,10 @@ instance = Instance.Instance(config)
 
 loop = asyncio.get_event_loop()
 
-startup = loop.run_until_complete(startup(instance))
+startup_resp = loop.run_until_complete(startup(instance))
 
-if len(startup) == 4:
-    config["name"], config["id"], config["coins"], config["items"]
+if len(startup_resp) == 4:
+    config["name"], config["id"], config["coins"], config["items"] = startup_resp
 else:
     raise 999
 
