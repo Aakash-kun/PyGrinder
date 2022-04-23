@@ -1,18 +1,18 @@
-Hey! 
-This is now one of my main projects, lookin forward to this! 
-That being said, it is still not anywhere near usable, still in development.
+Hey!<br>
+This is now one of my main projects, lookin forward to this!<br>
+That being said, it is still not anywhere near usable, still in development.<br>
 
 ## Contributing
 Glad you wanna, scroll down and check out my TODO list, now you know what to do!
 
 ## TODO:
-This project was heavily inspired by [this one](https://github.com/dankgrinder/dankgrinder) and hopes to achieve at least what the original program has done.
+This project was heavily inspired by [this one](https://github.com/dankgrinder/dankgrinder) and hopes to achieve at least what the original program has done.<br>
 I.E. shifts, instances, config etc
 
-This should also support more functions such as daily, weekly, monthly etc, as well as be compatible with new updates.
+This should also support more functions such as daily, weekly, monthly etc, as well as be compatible with new updates.<br>
 (also alot for my own experience so yes)
 
-Currently, need to make logging use local config, not global 💀
+Currently, need to make logging use local config, not global 💀<br>
 
 ## Errors:
     - 200: Ok! With content
