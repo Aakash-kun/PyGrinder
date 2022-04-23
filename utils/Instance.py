@@ -9,6 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import os
 import aiosqlite
 
+
 class Instance:
     def __init__(self, config: dict) -> None:
         self.config = config
@@ -31,10 +32,13 @@ class Instance:
         self.heartbeat_interval: int = config.get("heartbeat_interval", 60)
 
         self.session: aiohttp.ClientSession = config.get("session", None)
-        self.voting_session: aiohttp.ClientSession = config.get("voting_session", None)
+        self.voting_session: aiohttp.ClientSession = config.get(
+            "voting_session", None)
 
         self.logger: logging.Logger = config.get("logger", None)
-        self.traceback_logger: logging.Logger = config.get("traceback_logger", None)
+        self.traceback_logger: logging.Logger = config.get(
+            "traceback_logger", None)
+        self.logging_level: str = config.get("logging_level", "INFO")
 
         self._beg_interval = int(config["_beg_interval"])
 
@@ -46,22 +50,19 @@ class Instance:
         self._crime_cancel: list = config["_crime_cancel"]
         self._crime_timeout: int = config["_crime_timeout"]
 
-
         self.utils = utils
-
 
         asyncio.get_event_loop().run_until_complete(self.create_sessions())
 
     def update(self, config):
         self.__init__(config)
 
-
     def create_loggers(self):
         logging.basicConfig(
             filename=f"logs\{self.config['id']}.log",
             format="%(levelname)-10s | %(asctime)s | %(filename)-20s | %(token)s | %(status_code)s | %(username)-10s | %(message)s",
             datefmt="%I:%M:%S %p %d/%m/%Y",
-            level="DEBUG"
+            level=self.logging_level
         )
         logger = logging.getLogger()
         self.logger = logger
@@ -77,7 +78,6 @@ class Instance:
         self.traceback_logger = traceback_logger
         self.config["traceback_logger"] = traceback_logger
 
-
     async def create_sessions(self):
         self.session = aiohttp.ClientSession()
         self.voting_session = aiohttp.ClientSession()
@@ -88,7 +88,6 @@ class Instance:
 
     def close_sessions(self):
         asyncio.get_event_loop().run_until_complete(self._close_client_sessions())
-
 
     def get_details(self, key=None):
         if key:
@@ -102,7 +101,7 @@ class Instance:
         elif task == "REM":
             self.coins -= amount
         elif task == "SET":
-            self.coins = coins
+            self.coins = amount
 
     def _update_items(self, items: dict, task: Literal["ADD", "REM", "SET"]) -> None:
         for item, amount in items.items():
@@ -112,7 +111,7 @@ class Instance:
                 self.items[item] -= amount
             elif task == "SET":
                 self.items[item] = amount
-            
+
             if not self.items[item]:
                 del self.items[item]
 
@@ -130,7 +129,6 @@ class Instance:
             return 0, {}
         return data
 
-
     async def send_message(self, payload: dict[str, str]) -> aiohttp.ClientResponse:
         send_message = await self.session.post(
             f"https://discord.com/api/v9/channels/{self.grind_channel_id}/messages",
@@ -142,8 +140,9 @@ class Instance:
 
     async def wait_for(self, event_type: str, predicate, send_message_json: dict) -> Tuple[int, Union[None, Classes.MessageClass]]:
         start = time.time()
-        if predicate == "default": # must reference
-            predicate = event["d"]["author"]["id"] == 270904126974590976 and event["d"]["referenced_message"] is not None and str(event["d"]["referenced_message"]["id"]) == str(send_message_json["id"])
+        if predicate == "default":  # must reference
+            predicate = event["d"]["author"]["id"] == 270904126974590976 and event["d"]["referenced_message"] is not None and str(
+                event["d"]["referenced_message"]["id"]) == str(send_message_json["id"])
         while time.time() - start < self.response_timeout:
             event = self.ws.recv()
             if event["t"] == event_type and predicate(event, send_message_json):

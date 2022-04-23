@@ -1,5 +1,7 @@
 __pycache__/
-.venv/
+.uvenv/
+.wvenv/
 config.py
 
 RandomStuffIDontWantToPush/
+*.log

@@ -1,7 +1,7 @@
 import json
 
 async def startup(instance):
-    r = await instance.get_items_coins()
+    coins, items = await instance.get_items_coins()
 
     response = await instance.session.get("https://discordapp.com/api/v9/users/@me", headers=instance.utils.get_headers(instance))
     if response.status != 200:

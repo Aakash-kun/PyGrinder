@@ -4,3 +4,5 @@ class BadToken(Exception):
 class Banned(Exception):
     pass
 
+class CantSend(Exception):
+    pass
