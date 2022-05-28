@@ -1,3 +1,5 @@
+HELP I CANT GET LOCAL LOGGING CONFIG, CHECK [this](https://github.com/koala9712/PyGrinder/blob/master/utils/Instance.py#L60-L79)
+
 Hey!<br>
 This is now one of my main projects, lookin forward to this!<br>
 That being said, it is still not anywhere near usable, still in development.<br>
