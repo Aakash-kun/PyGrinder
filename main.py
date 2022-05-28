@@ -1,7 +1,7 @@
 from functions.basic7functions import beg, crime, search, postmeme
 # from functions.excess_tasks import timely, vote
 from utils import Instance
-from ws import heartbeat, create
+from ws import ws
 from scheduler.schedule import Q
 from functions.excess_tasks.startup import startup
 import asyncio
@@ -15,15 +15,15 @@ def BuildInstance(config):
     loop = asyncio.get_event_loop()
     startup_resp = loop.run_until_complete(startup(instance))
 
-    if len(startup_resp) == 4:
-        config["name"], config["id"], config["coins"], config["items"] = startup_resp
-    else:
+    if startup_resp[0] == 999:
         raise Exceptions.BadToken
 
-    ws, heartbeat_interval = loop.run_until_complete(
-        create.create(config["token"], instance.session))
+    config["name"], config["id"], config["coins"], config["items"] = startup_resp
 
-    config["ws"] = ws
+    instance_ws, heartbeat_interval = loop.run_until_complete(
+        ws.create(config["token"], instance.session))
+
+    config["ws"] = instance_ws
     config["heartbeat_interval"] = heartbeat_interval
 
     instance.update(config)
@@ -37,7 +37,7 @@ def BuildInstance(config):
 
 instance = BuildInstance(
     config={
-        "token": "TOKEN",
+        "token": "OTU1ODc2ODkxNDUyMTI1MjA0.YmKgAQ.VOeJtAG3bMKAB2rLDuIblK0tpnk",
         "grind_channel_id": 1234,
         "master_id": 1234,
         "response_timeout": 10,
@@ -66,7 +66,7 @@ def queue_beg():
 
 
 def queue_heartbeat():
-    instance.queue.put(0, heartbeat.heartbeat, instance)
+    instance.queue.put(0, ws.heartbeat, instance)
 
 
 def queue_db_push():
@@ -83,4 +83,4 @@ instance.scheduler.start()
 
 while True:
     asyncio.get_event_loop().run_forever()
-    print("ran it lmfao")
+    print("ran it hehe")

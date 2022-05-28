@@ -8,12 +8,13 @@ from utils import Classes, utils
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import os
 import aiosqlite
+import json
 
 
 class Instance:
     def __init__(self, config: dict) -> None:
         self.config = config
-        self.id: int = config.get("id", 1)
+        self.id: int = config.get("id", 0)
         self.name: str = config.get("name", "Default")
         self.token: str = config["token"]
         self.grind_channel_id: int = config["grind_channel_id"]
@@ -25,11 +26,11 @@ class Instance:
         self.queue: schedule.Q() = config["queue"]
         self.scheduler = AsyncIOScheduler()
 
-        self.coins: int = config.get("coins", 1)
-        self.items: dict = config.get("items", {"item": 0})
+        self.coins: int = config.get("coins", 0)
+        self.items: dict = config.get("items", {})
 
         self.ws: aiohttp.ClientWebSocketResponse = config.get("ws", None)
-        self.heartbeat_interval: int = config.get("heartbeat_interval", 60)
+        self.heartbeat_interval: int = config.get("heartbeat_interval", 40)
 
         self.session: aiohttp.ClientSession = config.get("session", None)
         self.voting_session: aiohttp.ClientSession = config.get(
@@ -52,6 +53,7 @@ class Instance:
 
         self.utils = utils
 
+        self.create_loggers()
         asyncio.get_event_loop().run_until_complete(self.create_sessions())
 
     def update(self, config):
